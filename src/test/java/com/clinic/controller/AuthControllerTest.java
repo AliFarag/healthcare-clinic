@@ -1,7 +1,9 @@
 package com.clinic.controller;
 
+import com.clinic.config.SecurityConfig;
 import com.clinic.dto.request.LoginRequest;
 import com.clinic.dto.response.AuthResponse;
+import com.clinic.exception.GlobalExceptionHandler;
 import com.clinic.repository.TokenBlacklistRepository;
 import com.clinic.security.JwtAuthFilter;
 import com.clinic.security.JwtUtil;
@@ -14,7 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,12 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(
-    controllers = AuthController.class,
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.ASSIGNABLE_TYPE,
-        classes = JwtAuthFilter.class
-    )
+    {AuthController.class, GlobalExceptionHandler.class}
 )
+@Import(SecurityConfig.class)              // import so PUBLIC_URLS rule is applied
 @ActiveProfiles("test")
 @DisplayName("AuthController Tests")
 class AuthControllerTest {
@@ -44,10 +45,13 @@ class AuthControllerTest {
     @MockBean private JwtUtil jwtUtil;
     @MockBean private UserDetailsService userDetailsService;
     @MockBean private TokenBlacklistRepository tokenBlacklistRepository;
+    @MockBean private JwtAuthFilter jwtAuthFilter;
+    @MockBean private AuthenticationManager authenticationManager;
 
     @Test
     @DisplayName("POST /auth/login - should return JWT on valid credentials")
     void shouldLoginSuccessfully() throws Exception {
+        // No @WithMockUser needed — /api/v1/auth/** is public in SecurityConfig
         LoginRequest request = new LoginRequest("admin", "Admin@123");
 
         AuthResponse mockResponse = AuthResponse.builder()
