@@ -2,22 +2,15 @@ package com.clinic.controller;
 
 import com.clinic.dto.request.PatientRequest;
 import com.clinic.dto.response.PatientResponse;
-import com.clinic.repository.TokenBlacklistRepository;
-import com.clinic.security.JwtAuthFilter;
-import com.clinic.security.JwtUtil;
 import com.clinic.service.PatientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,32 +23,16 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-    controllers = PatientController.class,
-    excludeFilters = @ComponentScan.Filter(   // exclude JwtAuthFilter from being loaded
-        type = FilterType.ASSIGNABLE_TYPE,
-        classes = JwtAuthFilter.class
-    )
-)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @DisplayName("PatientController Tests")
 class PatientControllerTest {
 
     @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
     @MockBean private PatientService patientService;
-    @MockBean private JwtUtil jwtUtil;
-    @MockBean private UserDetailsService userDetailsService;
-    @MockBean private TokenBlacklistRepository tokenBlacklistRepository;
-
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     @Test
     @WithMockUser(roles = "ADMIN")

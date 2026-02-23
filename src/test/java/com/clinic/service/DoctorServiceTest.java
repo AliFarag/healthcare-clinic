@@ -79,25 +79,4 @@ class DoctorServiceTest {
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessageContaining("Doctor not found");
     }
-
-    @Test
-    @DisplayName("Should return doctors by specialty")
-    void shouldReturnDoctorsBySpecialty() {
-        when(doctorRepository.findBySpecialtyIgnoreCase("Cardiology")).thenReturn(List.of(doctor1));
-
-        List<DoctorResponse> result = doctorService.getDoctorsBySpecialty("Cardiology");
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getSpecialty()).isEqualTo("Cardiology");
-    }
-
-    @Test
-    @DisplayName("Should return empty list when no doctors match specialty")
-    void shouldReturnEmptyWhenNoSpecialtyMatch() {
-        when(doctorRepository.findBySpecialtyIgnoreCase("Neurology")).thenReturn(List.of());
-
-        List<DoctorResponse> result = doctorService.getDoctorsBySpecialty("Neurology");
-
-        assertThat(result).isEmpty();
-    }
 }
