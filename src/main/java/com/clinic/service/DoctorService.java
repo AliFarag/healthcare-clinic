@@ -6,5 +6,4 @@ import java.util.List;
 public interface DoctorService {
     List<DoctorResponse> getAllActiveDoctors();
     DoctorResponse getDoctorById(Long id);
-    List<DoctorResponse> getDoctorsBySpecialty(String specialty);
 }

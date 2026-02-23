@@ -2,8 +2,6 @@ package com.clinic.service.impl;
 
 import com.clinic.dto.request.LoginRequest;
 import com.clinic.dto.response.AuthResponse;
-import com.clinic.entity.TokenBlacklist;
-import com.clinic.repository.TokenBlacklistRepository;
 import com.clinic.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,7 +18,6 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
 
     public AuthResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -49,19 +44,8 @@ public class AuthService {
     }
 
     public void logout(String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        LocalDateTime expiresAt = LocalDateTime.now()
-            .plusSeconds(jwtUtil.getExpirationMs() / 1000);
-
-        TokenBlacklist blacklisted = TokenBlacklist.builder()
-            .token(token)
-            .expiresAt(expiresAt)
-            .build();
-
-        tokenBlacklistRepository.save(blacklisted);
-        log.info("Token blacklisted (logout)");
+        // JWT tokens are stateless. Logout is handled client-side by discarding the token.
+        // The token remains valid until its TTL expiration.
+        log.info("Logout request processed. Client should discard the JWT token");
     }
 }

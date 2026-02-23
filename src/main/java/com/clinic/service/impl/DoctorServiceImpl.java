@@ -39,14 +39,6 @@ public class DoctorServiceImpl implements DoctorService {
         return toResponse(doctor);
     }
 
-    @Override
-    @Cacheable(value = "doctors", key = "'specialty-' + #specialty")
-    public List<DoctorResponse> getDoctorsBySpecialty(String specialty) {
-        return doctorRepository.findBySpecialtyIgnoreCase(specialty).stream()
-            .map(this::toResponse)
-            .collect(Collectors.toList());
-    }
-
     private DoctorResponse toResponse(Doctor doctor) {
         return DoctorResponse.builder()
             .id(doctor.getId())
